@@ -3,8 +3,7 @@ package id.zelory.compressor
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import rx.Observable
-import rx.functions.Func0
+import io.reactivex.Observable
 import java.io.File
 
 /**
@@ -45,27 +44,26 @@ class CompressorKt private constructor(private val context: Context) {
   private var compressFormat: Bitmap.CompressFormat = Bitmap.CompressFormat.JPEG
   private var bitmapConfig: Bitmap.Config = Bitmap.Config.ARGB_8888
   private var quality = 80
-  private var destinationDirectoryPath: String = context.cacheDir.path + File.pathSeparator + FileUtil.FILES_PATH
+  private var destinationDirectoryPath: String = context.cacheDir.path + File.pathSeparator
   private var fileNamePrefix: String? = null
   private var fileName: String? = null
 
   fun compressToFile(file: File?): File {
-    return ImageUtil.compressImage(context, Uri.fromFile(file), maxWidth, maxHeight,
-        compressFormat, bitmapConfig, quality, destinationDirectoryPath,
-        fileNamePrefix, fileName)
+    return ImageUtil.compressImage(file, maxWidth, maxHeight, compressFormat, quality,
+            destinationDirectoryPath + File.separator + fileName)
   }
 
-  fun compressToBitmap(file: File?): Bitmap {
-    return ImageUtil.getScaledBitmap(context, Uri.fromFile(file), maxWidth, maxHeight, bitmapConfig)
-  }
+//  fun compressToBitmap(file: File?): Bitmap {
+//    return ImageUtil.getScaledBitmap(context, Uri.fromFile(file), maxWidth, maxHeight, bitmapConfig)
+//  }
 
   fun compressToFileAsObservable(file: File?): Observable<File> {
     return Observable.defer { Observable.just(compressToFile(file)) }
   }
 
-  fun compressToBitmapAsObservable(file: File?): Observable<Bitmap> {
-    return Observable.defer { Observable.just(compressToBitmap(file)) }
-  }
+//  fun compressToBitmapAsObservable(file: File?): Observable<Bitmap> {
+//    return Observable.defer { Observable.just(compressToBitmap(file)) }
+//  }
 
   /**
    * Builder pattern in a fancy functional way

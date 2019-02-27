@@ -16,11 +16,8 @@ import android.widget.TextView
 import android.widget.Toast
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.CompressorKt
-import id.zelory.compressor.FileUtil
-import id.zelory.compressor.compressToBitmap
-import id.zelory.compressor.compressToFile
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.io.IOException
 import java.text.DecimalFormat
@@ -100,10 +97,12 @@ class MainKtActivity : AppCompatActivity() {
           .compressToFileAsObservable(actualImage)
           .subscribeOn(Schedulers.io())
           .observeOn(AndroidSchedulers.mainThread())
-          .subscribe({
-            compressedImage = it
-            setCompressedImage()
-          }) { showError(it.message) }
+              .subscribe({ item: File ->
+                compressedImage = item
+                setCompressedImage()
+              }) { error: Throwable ->
+                val test = ""
+              }
     }
   }
 
@@ -120,7 +119,7 @@ class MainKtActivity : AppCompatActivity() {
       }.compressToFile(actualImage)
       setCompressedImage()
 
-      Compressor.Builder(this).setMaxWidth(640f).build().compressToFile(actualImage)
+      Compressor(this).setMaxWidth(640f).compressToFile(actualImage)
 
       // Compress image using RxJava in background thread with custom Compressor
 //      CompressorKt.create(this) {
